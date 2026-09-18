@@ -20,7 +20,7 @@ plugins {
   alias(libs.plugins.kotlin.compose) apply false
   alias(libs.plugins.nexus.plugin)
   alias(libs.plugins.spotless)
-  alias(libs.plugins.dokka)
+  alias(libs.plugins.dokka) apply false
 }
 
 subprojects {
