@@ -69,48 +69,40 @@ private enum class ButtonState { Idle, Pressed }
  *   are already animated/translated independently of layout.
  */
 fun Modifier.showcaseTarget(
-  state: ShowcaseState,
-  index: Int,
-  title: String,
-  description: String,
-  shape: TargetShape = TargetShape.Circle,
-  padding: Float = 24f,
-  scaleFactor: Float = 1f,
-  translationY: Float = 0f,
+    state: ShowcaseState,
+    index: Int,
+    title: String,
+    description: String,
+    shape: TargetShape = TargetShape.Circle,
+    padding: Float = 24f,
+    scaleFactor: Float = 1f,
+    translationY: Float = 0f,
 ): Modifier = this.onGloballyPositioned { layoutCoordinates ->
-  val size = layoutCoordinates.size.toSize()
-  if (size.width == 0f || size.height == 0f) return@onGloballyPositioned
+    val size = layoutCoordinates.size.toSize()
+    if (size.width == 0f || size.height == 0f) return@onGloballyPositioned
 
-  val screenWidth = layoutCoordinates.findRootCoordinates().size.width.toFloat()
-  val rootBounds = layoutCoordinates.boundsInRoot()
-  val windowOffset = layoutCoordinates.findRootCoordinates().positionOnScreen()
+    val screenWidth = layoutCoordinates.findRootCoordinates().size.width.toFloat()
+    val rootBounds = layoutCoordinates.boundsInRoot()
 
-  val screenBounds = Rect(
-    left = rootBounds.left + windowOffset.x,
-    top = rootBounds.top + windowOffset.y,
-    right = rootBounds.right + windowOffset.x,
-    bottom = rootBounds.bottom + windowOffset.y,
-  )
+    val cx = rootBounds.center.x
+    val cy = rootBounds.center.y
+    val hw = (rootBounds.width / 2f) * scaleFactor
+    val hh = (rootBounds.height / 2f) * scaleFactor
+    val scaledBounds = Rect(cx - hw, cy - hh, cx + hw, cy + hh)
 
-  val cx = screenBounds.center.x
-  val cy = screenBounds.center.y
-  val hw = (screenBounds.width / 2f) * scaleFactor
-  val hh = (screenBounds.height / 2f) * scaleFactor
-  val scaledBounds = Rect(cx - hw, cy - hh, cx + hw, cy + hh)
-
-  state.registerTarget(
-    target = ShowcaseTarget(
-      index = index,
-      bounds = scaledBounds,
-      title = title,
-      description = description,
-      shape = shape,
-      padding = padding,
-      scaleFactor = 1f,
-      translationY = translationY,
-    ),
-    screenWidth = screenWidth,
-  )
+    state.registerTarget(
+        target = ShowcaseTarget(
+            index = index,
+            bounds = scaledBounds,
+            title = title,
+            description = description,
+            shape = shape,
+            padding = padding,
+            scaleFactor = 1f,
+            translationY = translationY,
+        ),
+        screenWidth = screenWidth,
+    )
 }
 
 /**
@@ -120,44 +112,44 @@ fun Modifier.showcaseTarget(
  * the library needs no design-system input from the host app.
  */
 internal fun Modifier.pulseClick(
-  enabled: Boolean = true,
-  interactionSource: MutableInteractionSource? = null,
-  pressedScaleFactor: Float = 0.92f,
-  onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+    pressedScaleFactor: Float = 0.92f,
+    onClick: (() -> Unit)? = null,
 ): Modifier = composed {
-  var state by remember { mutableStateOf(ButtonState.Idle) }
-  val scale by animateFloatAsState(
-    targetValue = if (state == ButtonState.Pressed) pressedScaleFactor else 1f,
-    animationSpec = spring(
-      dampingRatio = Spring.DampingRatioMediumBouncy,
-      stiffness = Spring.StiffnessLow,
-    ),
-    label = "bounce",
-  )
+    var state by remember { mutableStateOf(ButtonState.Idle) }
+    val scale by animateFloatAsState(
+        targetValue = if (state == ButtonState.Pressed) pressedScaleFactor else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "bounce",
+    )
 
-  graphicsLayer {
-    scaleX = scale
-    scaleY = scale
-    clip = true
-  }
-    .pointerInput(enabled, onClick) {
-      if (!enabled) return@pointerInput
-      detectTapGestures(
-        onPress = { offset ->
-          val press = PressInteraction.Press(offset)
-          state = ButtonState.Pressed
-          interactionSource?.tryEmit(press)
-
-          val released = tryAwaitRelease()
-
-          state = ButtonState.Idle
-          if (released) {
-            interactionSource?.tryEmit(PressInteraction.Release(press))
-          } else {
-            interactionSource?.tryEmit(PressInteraction.Cancel(press))
-          }
-        },
-        onTap = { onClick?.invoke() },
-      )
+    graphicsLayer {
+        scaleX = scale
+        scaleY = scale
+        clip = true
     }
+        .pointerInput(enabled, onClick) {
+            if (!enabled) return@pointerInput
+            detectTapGestures(
+                onPress = { offset ->
+                    val press = PressInteraction.Press(offset)
+                    state = ButtonState.Pressed
+                    interactionSource?.tryEmit(press)
+
+                    val released = tryAwaitRelease()
+
+                    state = ButtonState.Idle
+                    if (released) {
+                        interactionSource?.tryEmit(PressInteraction.Release(press))
+                    } else {
+                        interactionSource?.tryEmit(PressInteraction.Cancel(press))
+                    }
+                },
+                onTap = { onClick?.invoke() },
+            )
+        }
 }

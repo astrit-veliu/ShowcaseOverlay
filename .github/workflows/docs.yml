@@ -1,0 +1,55 @@
+name: Deploy API docs
+
+# Builds Dokka HTML for the library and publishes it to GitHub Pages.
+# One-time manual step: Settings -> Pages -> Source -> "GitHub Actions".
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - run: chmod +x gradlew
+
+      # Task name/output path come from the Dokka Gradle plugin the
+      # vanniktech publish plugin already pulls in (visible in your CI log
+      # as ":showcaseoverlay:dokkaGeneratePublicationHtml"). If a Dokka
+      # version bump ever renames the task, `./gradlew tasks --group dokka`
+      # will show the current one.
+      - run: ./gradlew :showcaseoverlay:dokkaGeneratePublicationHtml
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: showcaseoverlay/build/dokka/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

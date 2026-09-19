@@ -1,5 +1,6 @@
 package io.github.astritveliu.showcaseoverlay.ui.state
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -24,7 +25,7 @@ import androidx.compose.ui.unit.dp
 data class ShowcaseStyle(
     val accentColor: Color = Color(0xFFE53935),
     val scrimColor: Color = Color(0xE5080008),
-    val cardColor: Color = Color(0xFFFFFFFF),
+    val cardColor: Color? = null,
     val cornerRadius: Dp = 16.dp,
     val closeIcon: ImageVector? = null
 )
