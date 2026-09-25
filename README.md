@@ -8,6 +8,14 @@
 
 A Jetpack Compose library for spotlight-style app showcases and feature tours. A cutout highlights one composable at a time, a tooltip explains it, and the sequence advances step by step, driven entirely by Compose state with no dependencies beyond Compose itself.
 
+## Preview
+
+<p align="center">
+  <img src="screenshots/screenshot_1.png" width="30%" />
+  <img src="screenshots/screenshot_2.png" width="30%" />
+  <img src="screenshots/screenshot_3.png" width="30%" />
+</p>
+
 ## Installation
 
 ```kotlin
