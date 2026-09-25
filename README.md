@@ -20,7 +20,7 @@ A Jetpack Compose library for spotlight-style app showcases and feature tours. A
 
 ```kotlin
 dependencies {
-    implementation("io.github.astrit-veliu:showcaseoverlay:1.0.0")
+    implementation("io.github.astrit-veliu:showcaseoverlay:1.1.0")
 }
 ```
 
