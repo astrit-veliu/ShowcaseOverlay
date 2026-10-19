@@ -95,15 +95,21 @@ import kotlin.time.Duration.Companion.milliseconds
  * backstop only; well-formed targets never hit the clamp.
  *
  * @param state The [ShowcaseState] driving this overlay.
+ * @param advanceOnTap When [advanceOnTap] is true (default), tapping the overlay advances to the
+ * next step, or dismisses it on the last step. When false, taps on the scrim
+ * are still consumed (nothing leaks to the UI underneath), but they do
+ * nothing, so progress is driven only by the tooltip's Next/Previous/Dismiss
+ * buttons.
  * @param modifier Applied to the overlay's root.
  * @param style Visual configuration - accent color, scrim color, card color,
  *   corner radius. Defaults to [ShowcaseStyle]'s built-in defaults.
  */
 @Composable
 fun ShowcaseOverlay(
-    state: ShowcaseState,
     modifier: Modifier = Modifier,
-    style: ShowcaseStyle = ShowcaseStyle(),
+    state: ShowcaseState,
+    advanceOnTap: Boolean = true,
+    style: ShowcaseStyle = ShowcaseStyle()
 ) {
     var originInRoot by remember { mutableStateOf<Offset?>(null) }
 
@@ -241,7 +247,10 @@ fun ShowcaseOverlay(
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .clickable(enabled = advanceOnTap) {
+                        if (state.currentIndex == state.totalTargets - 1) state.dismiss() else state.next()
+                    }
             ) {
                 val animCenter = Offset(cutoutCenterX.value, cutoutCenterY.value)
 

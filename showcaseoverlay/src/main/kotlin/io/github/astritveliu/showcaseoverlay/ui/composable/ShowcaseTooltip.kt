@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -258,23 +259,22 @@ fun BoxScope.ShowcaseTooltip(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (currentStep > 0) {
-                        Text(
-                            modifier = Modifier.pulseClick {
+                        TextButton(
+                            onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onPrevious()
-                            },
-                            text = "Back",
-                            fontSize = 14.sp,
-                        )
+                            }
+                        ) {
+                            Text(text = "Back", fontSize = 14.sp)
+                        }
+
                     } else {
-                        Text(
-                            modifier = Modifier.pulseClick {
+                        TextButton(
+                            onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onDismiss()
-                            },
-                            text = "Skip tour",
-                            fontSize = 14.sp,
-                        )
+                            }
+                        ) { Text(text = "Skip tour", fontSize = 14.sp) }
                     }
 
                     Box(
